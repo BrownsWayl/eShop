@@ -24,8 +24,8 @@ export default {
   data() {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       loginRules: {
         username: [
@@ -50,9 +50,16 @@ export default {
           return
         }
         const {
-          data: { meta: res }
+          data: { data: dat, meta: met }
         } = await this.$axios.post('/login', this.loginForm)
-        console.log(res)
+        // console.log(dat)
+        if (met.status === 200) {
+          sessionStorage.setItem('token', dat.token)
+          this.$message.success('登录成功!')
+          this.$router.push('/home')
+        } else {
+          this.$message.error('账号或密码不正确!')
+        }
       })
     }
   }

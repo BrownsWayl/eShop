@@ -35,6 +35,10 @@ export default new VueRouter({
         {
           path: '/rights',
           component: () => import('../components/power/Rights.vue')
+        },
+        {
+          path: '/categories',
+          component: () => import('../components/goods/Cate.vue')
         }
       ]
     }

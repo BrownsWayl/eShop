@@ -30,7 +30,11 @@ export default new VueRouter({
         },
         {
           path: '/roles',
-          component: () => import('../components/rigths/Roles.vue')
+          component: () => import('../components/power/Roles.vue')
+        },
+        {
+          path: '/rights',
+          component: () => import('../components/power/Rights.vue')
         }
       ]
     }

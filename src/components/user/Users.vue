@@ -37,7 +37,7 @@
               <i class="el-icon-delete"></i>
             </el-button>
             <el-tooltip :enterable='false' effect='dark' content='设置角色' placement='top'>
-              <el-button size='mini' type='warning' @click="handleSetting(scope.$index, scope.row)">
+              <el-button size='mini' type='warning' @click="handleSetting(scope.row)">
               <i class="el-icon-setting"></i>
             </el-button>
             </el-tooltip>
@@ -94,6 +94,27 @@
         <el-button type='primary' @click="editUser">确定</el-button>
       </span>
     </el-dialog>
+      <!-- 分配角色 -->
+    <el-dialog title='分配角色' @close='closeRoleDialog'
+     :visible.sync='roleDialogVisible' width='50%'
+     >
+     <div>
+       <p>当前的用户: {{ currentUserInfo.username }}</p>
+       <p>当前的角色: {{ currentUserInfo.role_name }}</p>
+       <el-select v-model="selectedRoleID" placeholder="请选择...">
+        <el-option
+         v-for="item in allRoles"
+         :key="item.id"
+         :label="item.roleName"
+         :value="item.id">
+        </el-option>
+      </el-select>
+     </div>
+      <span slot='footer' class='dialog-footer'>
+        <el-button @click='roleDialogVisible=false'>取消</el-button>
+        <el-button @click="saveRole" type='primary'>确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -125,6 +146,10 @@ export default {
       switchValue: true,
       dialogVisible: false,
       editDialogVisible: false,
+      roleDialogVisible: false,
+      currentUserInfo: {},
+      selectedRoleID: '',
+      allRoles: [],
       editForm: {},
       addForm: {
         username: '',
@@ -166,6 +191,21 @@ export default {
     this.getUserList()
   },
   methods: {
+    closeRoleDialog() {
+      this.selectedRoleID = ''
+    },
+    async saveRole() {
+      if (!this.selectedRoleID) {
+        return this.$message.error('请选择要分配的角色!')
+      }
+      const { data: res } = await this.$axios.put(`users/${this.currentUserInfo.id}/role`, { rid: this.selectedRoleID })
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配角色失败!')
+      }
+      this.$message.success('分配成功!')
+      this.roleDialogVisible = false
+      this.getUserList()
+    },
     editUser() {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) {
@@ -242,7 +282,15 @@ export default {
       })
         .catch(err => console.log(err))
     },
-    handleSetting() {},
+    async handleSetting(row) {
+      this.currentUserInfo = row
+      this.roleDialogVisible = true
+      const { data: res } = await this.$axios.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败!')
+      }
+      this.allRoles = res.data
+    },
     async getUserList() {
       const { data: list } = await this.$axios.get('users', {
         params: this.queryInfo

@@ -43,6 +43,18 @@ export default new VueRouter({
         {
           path: '/params',
           component: () => import('../components/goods/Params.vue')
+        },
+        {
+          path: '/goods',
+          component: () => import('../components/goods/Goods.vue')
+        },
+        {
+          path: '/goods/add',
+          component: () => import('../components/goods/AddGoods.vue')
+        },
+        {
+          path: '/reports',
+          component: () => import('../components/report/Reports.vue')
         }
       ]
     }
